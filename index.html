@@ -137,9 +137,9 @@
       const { createApp } = Vue;
 
       const imagens_base = [
-        "pose1.jpg",
-        "pose2.jpeg",
-        "pose3.png",
+        "assets/imagens_modelo/pose1.jpg",
+        "assets/imagens_modelo/pose2.jpeg",
+        "assets/imagens_modelo/pose3.png",
       ];
 
       const app = createApp({
@@ -147,7 +147,7 @@
           return {
             modelo_inicializado: false,
             item_base: {
-              src: "pose2.jpeg",
+              src: imagens_base[1],
             },
             item_teste: {},
             score_corrente: 0,
@@ -157,7 +157,7 @@
               {
                 id: 0,
                 score: 574,
-                src: "pose2.jpeg",
+                src: imagens_base[1],
               },
             ],
           }
