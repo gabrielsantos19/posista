@@ -1,0 +1,321 @@
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="index.css">
+
+    <script src="scripts/tfjs.js"></script>
+    <!-- Import @tensorflow/tfjs-core -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script> -->
+    <!-- Adds the WebGL backend to the global backend registry -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script> -->
+    <script src="scripts/pose-detection.js"></script>
+    <!-- Script da aplicação -->
+    
+    <script src="index.js"></script>
+    <script src="scripts/vue.global.js"></script>
+
+    <link rel="stylesheet" href="assets/fonts/css2.css" />
+  </head>
+
+  <body>
+    <div id="app">
+      <header>
+        <img src="assets/logo.svg">
+      </header>
+
+      <main>
+        <div class="container">
+          <div class="itemBase">
+            <div><img id="imagemBase" :src="item_base.src"></div>
+            <div><canvas id="canvasBase"></canvas></div>
+            <div>
+              <div>
+                <span
+                  title="Alterar imagem modelo"
+                  @click="alterar_imagem_base"
+                  class="material-symbols-outlined medium"
+                  style="font-size: 50pt; cursor: pointer;"
+                >
+                  refresh
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="resultado">
+            <span class="score">
+              {{ score_corrente }}
+            </span>
+            <span class="mensagem">
+              {{ frase_corrente }}
+            </span>
+          </div>
+
+          <div class="itemDeEntrada">
+            <div><canvas id="canvas"></canvas></div>
+            <div>
+              <img
+                v-if="item_selecionado !== null"
+                id="imagemEntrada"
+                :src="historico[item_selecionado].src"
+              >
+            </div>
+            <div>
+              <video
+                v-show="item_selecionado === null"
+                id="videoEntrada"
+                autoplay="true"
+              ></video>
+            </div>
+            <div><canvas id="canvasEntrada"></canvas></div>
+            <div style="z-index: 1;">
+              <div>
+                <span
+                  title="Tirar foto"
+                  @click="tirarFoto"
+                  class="material-symbols-outlined"
+                  style="font-size: 50pt; cursor: pointer; color: white;"
+                >
+                  radio_button_checked
+                </span>
+                <span
+                  title="Trocar câmera"
+                  @click="reconfigurar_camera"
+                  class="material-symbols-outlined"
+                  style="font-size: 50pt; cursor: pointer;"
+                >
+                  switch_camera
+                </span>
+                <span
+                  title="Compartilhar"
+                  @click=""
+                  class="material-symbols-outlined"
+                  style="font-size: 50pt; cursor: pointer;"
+                >
+                  share
+                </span>
+                <span
+                  v-if="false"
+                  @click="atualizar_score"
+                  class="material-symbols-outlined"
+                  style="font-size: 50pt; cursor: pointer;"
+                >
+                  published_with_changes
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="historico">
+            <span class="historico-titulo">Histórico</span>
+            <div
+              v-for="item in historico"
+              :key="item.id"
+              @click="this.item_selecionado = item.id"
+              class="historico-item"
+            >
+              <div class="historico-imagem">
+                <img :src="item.src">
+              </div>
+              <span title="Pontuação" class="historico-score">
+                {{item.score}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <a href="https://www.ufs.br/"><img src="assets/ufs_vertical_positiva.png"></a>
+        <a href="https://www.ufs.br/"><img src="assets/ufs_horizontal_positiva.png"></a>
+        <a href="https://www.sigaa.ufs.br/sigaa/public/departamento/portal.jsf?id=83"><img src="assets/dcomp.png"></a>
+        <a href="https://www.sigaa.ufs.br/sigaa/public/departamento/portal.jsf?id=83"><img src="assets/dcomp2.png"></a>
+        <a href="https://gabrielsantos19.com/"><img src="assets/gabriel_santos.svg"></a>
+      </footer>
+    </div>
+
+    <script>
+      const { createApp } = Vue;
+
+      const imagens_base = [
+        "pose1.jpg",
+        "pose2.jpeg",
+        "pose3.png",
+      ];
+
+      const app = createApp({
+        data() {
+          return {
+            modelo_inicializado: false,
+            item_base: {
+              src: "pose2.jpeg",
+            },
+            item_teste: {},
+            score_corrente: 0,
+            item_selecionado: null,
+            id_intervalo: null,
+            historico: [
+              {
+                id: 0,
+                score: 574,
+                src: "pose2.jpeg",
+              },
+            ],
+          }
+        },
+        computed: {
+          frase_corrente() {
+            const index = Math.floor(this.score_corrente / 200)
+            const frases = [
+              "Sua imitação está muito ruim. Continue tentando!",
+              "Sua imitação está ruim. Não desanime, continue tentando!",
+              "Sua imitação está confusa.",
+              "Quase lá! Só restam pequenos ajustes.",
+              "Perfeito! Agora você pode compartilhe o seu resultado.",
+            ];
+            return frases[index]
+          },
+        },
+        mounted() {
+          Modelo.inicializar_modulo().then((r) => this.modelo_inicializado = r)
+          // const id_intervalo = setInterval(this.atualizar_score, 10000)
+          // this.id_intervalo = id_intervalo
+          if (navigator.mediaDevices.getUserMedia) {
+            this.abrir_camera()
+          }
+        },
+        beforeUnmount() {
+          if (this.id_intervalo) {
+            clearInterval(this.id_intervalo)
+          }
+        },
+        watch: {
+          // modelo_inicializado() {
+          //   this.atualizar_item_base()
+          //   this.atualizar_item_teste()
+          // },
+          // item_base() {
+          //   this.atualizar_item_base()
+          // },
+          // item_teste() {
+          //   this.atualizar_item_teste()
+          // },
+        },
+        methods: {
+          async atualizar_item_base() {
+            if (this.item_base.elemento) {
+              console.log("Atualizar item base - Já atualizado")
+              return
+            }
+            console.log("Atualizar item base")
+            const imagem = document.getElementById("imagemBase")
+            const canvas = document.getElementById("canvasBase")
+            canvas.width = imagem.width;
+            canvas.height = imagem.height;
+            this.item_base.elemento = imagem
+            console.log(imagem.src)
+            this.item_base.poses = await Modelo.estimar_poses(imagem)
+          },
+          async atualizar_item_teste_imagem() {
+            const imagem = document.getElementById("imagemEntrada")
+            const canvas = document.getElementById("canvasEntrada")
+            canvas.width = imagem.width;
+            canvas.height = imagem.height;
+            this.item_teste.elemento = imagem
+            this.item_teste.poses = await Modelo.estimar_poses(imagem)
+          },
+          async atualizar_item_teste_video() {
+            const video = document.getElementById("videoEntrada")
+            const canvas = document.getElementById("canvasEntrada")
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            this.item_teste.elemento = video
+            this.item_teste.poses = await Modelo.estimar_poses(video)
+          },
+          async atualizar_item_teste() {
+            console.log("Atualizar item teste")
+            if (this.item_selecionado !== null) {
+              await this.atualizar_item_teste_imagem()
+            } else {
+              await this.atualizar_item_teste_video()
+            }
+          },
+          plotar_pose(canvasId, item) {
+            const plotar = true
+            const apenas_relevantes = false
+            if (!plotar) return;
+            
+            console.log("Pintar pontos detectados na imagem")
+            const canvas = document.getElementById(canvasId)
+            const contexto = canvas.getContext("2d");
+            let keypoints = item.poses[0].keypoints
+
+            contexto.fillStyle = "green";
+            contexto.fillRect(0, 0, 50, 50)
+            // contexto.globalAlpha = 0.2;
+            contexto.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < keypoints.length; i += 1) {
+              const item = keypoints[i]
+              contexto.fillRect(item.x, item.y, 10, 10)
+            }
+          },
+          async atualizar_score() {
+            if (!this.modelo_inicializado) {
+              console.log("Modelo ainda não inicializado!")
+              return
+            }
+
+            await this.atualizar_item_base()
+            await this.atualizar_item_teste()
+            const item1 = this.item_base
+            const item2 = this.item_teste
+            const r = await Modelo.calcular_score_de_items(item1, item2)
+            this.plotar_pose("canvasBase", item1)
+            this.plotar_pose("canvasEntrada", item2)
+            this.score_corrente = r
+          },
+          tirarFoto() {
+            const proximo_id = this.historico.length
+            const data =  this.getImagemFromVideo()
+            this.historico.push({
+              id: proximo_id,
+              score: 0,
+              src: data,
+            });
+          },
+          reconfigurar_camera() {
+            this.item_selecionado = null
+          },
+          getImagemFromVideo() {
+            const video = document.getElementById('videoEntrada')
+            const canvas = document.getElementById('canvas')
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const canvasContext = canvas.getContext("2d");
+            canvasContext.drawImage(video, 0, 0);
+            const dataUrl = canvas.toDataURL()
+            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+            return dataUrl;
+          },
+          clearCanvas() {
+            const canvas = document.getElementById('canvas')
+            var canvasContext = canvas.getContext("2d");
+            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+          },
+          async abrir_camera() {
+            console.log("Abrindo câmera")
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+            document.getElementById('videoEntrada').srcObject = stream
+          },
+          async alterar_imagem_base() {
+            console.log("Alterar imagem base")
+            const x = Math.floor(Math.random() * imagens_base.length)
+            this.item_base = {
+              src: imagens_base[x],
+            }
+          },
+        },
+      });
+      app.mount('#app');
+    </script>
+  </body>
+</html>
