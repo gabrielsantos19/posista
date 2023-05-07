@@ -26,19 +26,17 @@
       <main>
         <div class="container">
           <div class="itemBase">
-            <div><img id="imagemBase" :src="item_base.src"></div>
-            <div><canvas id="canvasBase"></canvas></div>
-            <div>
-              <div>
-                <span
-                  title="Alterar imagem modelo"
-                  @click="alterar_imagem_base"
-                  class="material-symbols-outlined medium"
-                  style="font-size: 50pt; cursor: pointer;"
-                >
-                  refresh
-                </span>
-              </div>
+            <div class="imagem-base"><img id="imagemBase" :src="item_base.src"></div>
+            <div class="canvas-base"><canvas id="canvasBase"></canvas></div>
+            <div class="menu-base">
+              <span
+                title="Alterar imagem modelo"
+                @click="alterar_imagem_base"
+                class="material-symbols-outlined medium"
+                style="font-size: 50pt; cursor: pointer;"
+              >
+                refresh
+              </span>
             </div>
           </div>
 
@@ -52,57 +50,55 @@
           </div>
 
           <div class="itemDeEntrada">
-            <div><canvas id="canvas"></canvas></div>
-            <div>
+            <div class="canvas-geral-entrada"><canvas id="canvas"></canvas></div>
+            <div class="imagem-entrada">
               <img
                 v-if="item_selecionado !== null"
                 id="imagemEntrada"
                 :src="historico[item_selecionado].src"
               >
             </div>
-            <div>
+            <div class="video-entrada">
               <video
                 v-show="item_selecionado === null"
                 id="videoEntrada"
                 autoplay="true"
               ></video>
             </div>
-            <div><canvas id="canvasEntrada"></canvas></div>
-            <div style="z-index: 1;">
-              <div>
-                <span
-                  title="Tirar foto"
-                  @click="tirarFoto"
-                  class="material-symbols-outlined"
-                  style="font-size: 50pt; cursor: pointer; color: white;"
-                >
-                  radio_button_checked
-                </span>
-                <span
-                  title="Trocar câmera"
-                  @click="reconfigurar_camera"
-                  class="material-symbols-outlined"
-                  style="font-size: 50pt; cursor: pointer;"
-                >
-                  switch_camera
-                </span>
-                <span
-                  title="Compartilhar"
-                  @click=""
-                  class="material-symbols-outlined"
-                  style="font-size: 50pt; cursor: pointer;"
-                >
-                  share
-                </span>
-                <span
-                  v-if="false"
-                  @click="atualizar_score"
-                  class="material-symbols-outlined"
-                  style="font-size: 50pt; cursor: pointer;"
-                >
-                  published_with_changes
-                </span>
-              </div>
+            <div class="canvas-entrada"><canvas id="canvasEntrada"></canvas></div>
+            <div class="menu-entrada">
+              <span
+                title="Trocar câmera"
+                @click="reconfigurar_camera"
+                class="material-symbols-outlined"
+                style="font-size: 50pt; cursor: pointer;"
+              >
+                switch_camera
+              </span>
+              <span
+                title="Tirar foto"
+                @click="tirarFoto"
+                class="material-symbols-outlined"
+                style="font-size: 50pt; cursor: pointer; color: white;"
+              >
+                radio_button_checked
+              </span>
+              <span
+                title="Compartilhar"
+                @click=""
+                class="material-symbols-outlined"
+                style="font-size: 50pt; cursor: pointer;"
+              >
+                share
+              </span>
+              <span
+                v-if="false"
+                @click="atualizar_score"
+                class="material-symbols-outlined"
+                style="font-size: 50pt; cursor: pointer;"
+              >
+                published_with_changes
+              </span>
             </div>
           </div>
           <div class="historico">
@@ -156,7 +152,7 @@
             historico: [
               {
                 id: 0,
-                score: 574,
+                score: 500,
                 src: imagens_base[1],
               },
             ],
@@ -177,8 +173,8 @@
         },
         mounted() {
           Modelo.inicializar_modulo().then((r) => this.modelo_inicializado = r)
-          // const id_intervalo = setInterval(this.atualizar_score, 10000)
-          // this.id_intervalo = id_intervalo
+          const id_intervalo = setInterval(this.atualizar_score, 5000)
+          this.id_intervalo = id_intervalo
           if (navigator.mediaDevices.getUserMedia) {
             this.abrir_camera()
           }
@@ -228,7 +224,8 @@
             const canvas = document.getElementById("canvasEntrada")
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            this.item_teste.elemento = video
+            const dataURL = this.getImagemFromVideo()
+            this.item_teste.elemento = dataURL
             this.item_teste.poses = await Modelo.estimar_poses(video)
           },
           async atualizar_item_teste() {
@@ -263,14 +260,27 @@
               console.log("Modelo ainda não inicializado!")
               return
             }
+            if (this.item_selecionado !== null) return;
 
             await this.atualizar_item_base()
             await this.atualizar_item_teste()
             const item1 = this.item_base
             const item2 = this.item_teste
             const r = await Modelo.calcular_score_de_items(item1, item2)
-            this.plotar_pose("canvasBase", item1)
-            this.plotar_pose("canvasEntrada", item2)
+
+            const scores = this.historico.map((h) => h.score)
+            const maior_score = Math.max(...scores, 0)
+            if (r > maior_score) {
+              const proximo_id = this.historico.length
+              this.historico.push({
+                id: proximo_id,
+                score: r,
+                src: item2.elemento,
+              });
+            }
+
+            // this.plotar_pose("canvasBase", item1)
+            // this.plotar_pose("canvasEntrada", item2)
             this.score_corrente = r
           },
           tirarFoto() {
