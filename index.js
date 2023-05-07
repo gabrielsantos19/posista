@@ -18,7 +18,7 @@ const Modelo = (function() {
     async function estimar_poses(elemento) {
         if (!detector) return null
         const poses = await detector.estimatePoses(elemento)
-        if (poses[0].keypoints) {
+        if (poses.length && poses[0].keypoints) {
             return poses
         }
         return null
@@ -51,14 +51,14 @@ const Modelo = (function() {
     }
 
     async function calcular_score_de_items(item1, item2) {
-        if (detector === null) return 404;
+        if (detector === null) return 0;
 
         console.log("Calculando score de items")
-        if (!(item1.poses && item2.poses)) return 405
+        if (!(item1.poses && item2.poses)) return 0
         const keypoints1 = item1.poses[0].keypoints
         const keypoints2 = item2.poses[0].keypoints
 
-        if (!(keypoints1 && keypoints2)) return 406
+        if (!(keypoints1 && keypoints2)) return 0
         
         const score = await calcular_score(keypoints1, keypoints2)
         console.log(`Score: ${score}`)

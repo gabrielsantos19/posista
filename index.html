@@ -20,7 +20,7 @@
   <body>
     <div id="app">
       <header>
-        <img src="assets/logo.svg">
+        <img id="imagem-logo" src="assets/logo.svg">
       </header>
 
       <main>
@@ -28,21 +28,33 @@
           <div class="itemBase">
             <div class="imagem-base"><img id="imagemBase" :src="item_base.src"></div>
             <div class="canvas-base"><canvas id="canvasBase"></canvas></div>
-            <div class="menu-base">
-              <span
-                title="Alterar imagem modelo"
-                @click="alterar_imagem_base"
-                class="material-symbols-outlined medium"
-                style="font-size: 50pt; cursor: pointer;"
-              >
-                refresh
-              </span>
+            <div class="menu-base-container">
+              <div class="menu-base">
+                <span
+                  title="Alterar imagem modelo"
+                  @click="alterar_imagem_base"
+                  class="material-symbols-outlined medium"
+                  style="font-size: 50pt; cursor: pointer;"
+                >
+                  refresh
+                </span>
+              </div>
             </div>
           </div>
 
           <div class="resultado">
+            <span v-if="item_selecionado === null && contagem_regressiva !== 0">
+              Próxima foto em: {{ contagem_regressiva }}
+            </span>
+            <span v-if="item_selecionado === null && contagem_regressiva === 0">
+              Mantenha a pose, estou tirando a foto!
+            </span>
+            <span v-if="item_selecionado !== null">
+              Você está visualizando, clique no círculo para continuar tentando.
+            </span>
+
             <span class="score">
-              {{ score_corrente }}
+              {{ item_selecionado === null ? score_corrente : historico[item_selecionado].score }}
             </span>
             <span class="mensagem">
               {{ frase_corrente }}
@@ -66,39 +78,44 @@
               ></video>
             </div>
             <div class="canvas-entrada"><canvas id="canvasEntrada"></canvas></div>
-            <div class="menu-entrada">
-              <span
-                title="Trocar câmera"
-                @click="reconfigurar_camera"
-                class="material-symbols-outlined"
-                style="font-size: 50pt; cursor: pointer;"
-              >
-                switch_camera
-              </span>
-              <span
-                title="Tirar foto"
-                @click="tirarFoto"
-                class="material-symbols-outlined"
-                style="font-size: 50pt; cursor: pointer; color: white;"
-              >
-                radio_button_checked
-              </span>
-              <span
-                title="Compartilhar"
-                @click=""
-                class="material-symbols-outlined"
-                style="font-size: 50pt; cursor: pointer;"
-              >
-                share
-              </span>
-              <span
-                v-if="false"
-                @click="atualizar_score"
-                class="material-symbols-outlined"
-                style="font-size: 50pt; cursor: pointer;"
-              >
-                published_with_changes
-              </span>
+            <div class="menu-entrada-container">
+              <div class="menu-entrada">
+                <span
+                  title="Trocar câmera"
+                  @click="reconfigurar_camera"
+                  v-show="false"
+                  class="material-symbols-outlined"
+                  style="font-size: 50pt; cursor: pointer;"
+                >
+                  switch_camera
+                </span>
+                <span
+                  title="Continuar capturando"
+                  @click="reconfigurar_camera"
+                  v-show="item_selecionado !== null"
+                  class="material-symbols-outlined"
+                  style="font-size: 50pt; cursor: pointer; color: white;"
+                >
+                  radio_button_checked
+                </span>
+                <span
+                  title="Compartilhar"
+                  v-show="item_selecionado !== null"
+                  @click="compartilhar"
+                  class="material-symbols-outlined"
+                  style="font-size: 50pt; cursor: pointer;"
+                >
+                  share
+                </span>
+                <span
+                  v-if="false"
+                  @click="atualizar_score"
+                  class="material-symbols-outlined"
+                  style="font-size: 50pt; cursor: pointer;"
+                >
+                  published_with_changes
+                </span>
+              </div>
             </div>
           </div>
           <div class="historico">
@@ -127,6 +144,12 @@
         <a href="https://www.sigaa.ufs.br/sigaa/public/departamento/portal.jsf?id=83"><img src="assets/dcomp2.png"></a>
         <a href="https://gabrielsantos19.com/"><img src="assets/gabriel_santos.svg"></a>
       </footer>
+
+      <div v-show="false">
+        <canvas id="canvas-compartilhar"></canvas>
+        <a id="click-to-download" v-show="false" href="" download="O_Posista"></a>
+        <img id="imagem-badge" v-show="false" src="assets/badge.svg">
+      </div>
     </div>
 
     <script>
@@ -143,6 +166,7 @@
           return {
             modelo_inicializado: false,
             item_base: {
+              index: 1,
               src: imagens_base[1],
             },
             item_teste: {},
@@ -150,17 +174,58 @@
             item_selecionado: null,
             id_intervalo: null,
             historico: [
-              {
+            {
+                id: 0,
+                score: 500,
+                src: imagens_base[1],
+              },{
+                id: 0,
+                score: 500,
+                src: imagens_base[1],
+              },{
+                id: 0,
+                score: 500,
+                src: imagens_base[1],
+              },{
+                id: 0,
+                score: 500,
+                src: imagens_base[1],
+              },{
+                id: 0,
+                score: 500,
+                src: imagens_base[1],
+              },{
+                id: 0,
+                score: 500,
+                src: imagens_base[1],
+              },{
+                id: 0,
+                score: 500,
+                src: imagens_base[1],
+              },{
+                id: 0,
+                score: 500,
+                src: imagens_base[1],
+              },{
+                id: 0,
+                score: 500,
+                src: imagens_base[1],
+              },{
                 id: 0,
                 score: 500,
                 src: imagens_base[1],
               },
             ],
+            contagem_regressiva: 10,
           }
         },
         computed: {
           frase_corrente() {
-            const index = Math.floor(this.score_corrente / 200)
+            let score = this.score_corrente
+            if (this.item_selecionado !== null) {
+              score = this.historico[this.item_selecionado].score
+            }
+            const index = Math.floor(score / 200)
             const frases = [
               "Sua imitação está muito ruim. Continue tentando!",
               "Sua imitação está ruim. Não desanime, continue tentando!",
@@ -173,7 +238,7 @@
         },
         mounted() {
           Modelo.inicializar_modulo().then((r) => this.modelo_inicializado = r)
-          const id_intervalo = setInterval(this.atualizar_score, 5000)
+          const id_intervalo = setTimeout(this.contar_contagem_regressiva, 1000)
           this.id_intervalo = id_intervalo
           if (navigator.mediaDevices.getUserMedia) {
             this.abrir_camera()
@@ -181,10 +246,20 @@
         },
         beforeUnmount() {
           if (this.id_intervalo) {
-            clearInterval(this.id_intervalo)
+            clearTimeout(this.id_intervalo)
           }
         },
         watch: {
+          item_selecionado() {
+            if (this.item_selecionado === null) {
+              const id_intervalo = setTimeout(this.contar_contagem_regressiva, 1000)
+              this.contagem_regressiva = 10
+              this.id_intervalo = id_intervalo
+            } else {
+              clearTimeout(this.id_intervalo)
+              this.id_intervalo = null
+            }
+          }
           // modelo_inicializado() {
           //   this.atualizar_item_base()
           //   this.atualizar_item_teste()
@@ -197,6 +272,55 @@
           // },
         },
         methods: {
+          async contar_contagem_regressiva() {
+            if (this.contagem_regressiva > 0) {
+              this.contagem_regressiva = this.contagem_regressiva - 1
+            } else {
+              this.contagem_regressiva = 10
+              await this.atualizar_score()
+            }
+            if (this.item_selecionado === null) {
+              const id_intervalo = setTimeout(this.contar_contagem_regressiva, 1000)
+              this.id_intervalo = id_intervalo
+            }
+          },
+          async compartilhar() {
+            const imagem_logo = document.getElementById("imagem-logo")
+            const imagem_modelo = document.getElementById("imagemBase")
+            const imagem_teste = document.getElementById("imagemEntrada")
+            const imagem_badge = document.getElementById("imagem-badge")
+            const score = this.historico[this.item_selecionado].score;
+
+            const canvas = document.getElementById("canvas-compartilhar")
+            canvas.width = 1300;
+            canvas.height = 700;
+            const contexto = canvas.getContext("2d")
+            contexto.fillStyle = "white";
+            contexto.fillRect(0, 0, 1300, 700);
+            contexto.drawImage(imagem_modelo, 50, 130, 500, 500);
+            contexto.drawImage(imagem_teste, 750, 130, 500, 500);
+            contexto.drawImage(imagem_logo, 490, 10, 300, 70);
+            contexto.drawImage(imagem_badge, 510, 230, 280, 280);
+            contexto.font = "70px serif";
+            contexto.fillText('🔥', 520, 230);
+            contexto.fillText('💪', 680, 580);
+            contexto.fillText('🤣', 680, 200);
+            contexto.font = "150px serif";
+            contexto.fillStyle = "#2e3c50";
+            contexto.fillText(score, 535, 410);
+            contexto.font = "50px serif";
+            contexto.fillText("/1000", 590, 450);
+            contexto.fillText("Expectativa", 150, 120);
+            contexto.fillText("Realidade", 900, 120);
+            contexto.fillText("https://posista.gabrielsantos19.com", 300, 675);
+            contexto.font = "30px serif";
+            contexto.fillText("~ Imite a pose ~", 550, 110);
+
+            const imagem = canvas.toDataURL()
+            const ahref = document.getElementById("click-to-download")
+            ahref.href = imagem
+            ahref.click()
+          },
           async atualizar_item_base() {
             if (this.item_base.elemento) {
               console.log("Atualizar item base - Já atualizado")
@@ -240,6 +364,7 @@
             const plotar = true
             const apenas_relevantes = false
             if (!plotar) return;
+            if (!item.poses) return;
             
             console.log("Pintar pontos detectados na imagem")
             const canvas = document.getElementById(canvasId)
@@ -268,19 +393,15 @@
             const item2 = this.item_teste
             const r = await Modelo.calcular_score_de_items(item1, item2)
 
-            const scores = this.historico.map((h) => h.score)
-            const maior_score = Math.max(...scores, 0)
-            if (r > maior_score) {
-              const proximo_id = this.historico.length
-              this.historico.push({
-                id: proximo_id,
-                score: r,
-                src: item2.elemento,
-              });
-            }
+            const proximo_id = this.historico.length
+            this.historico.push({
+              id: proximo_id,
+              score: r,
+              src: item2.elemento,
+            });
 
-            // this.plotar_pose("canvasBase", item1)
-            // this.plotar_pose("canvasEntrada", item2)
+            this.plotar_pose("canvasBase", item1)
+            this.plotar_pose("canvasEntrada", item2)
             this.score_corrente = r
           },
           tirarFoto() {
@@ -318,10 +439,13 @@
           },
           async alterar_imagem_base() {
             console.log("Alterar imagem base")
-            const x = Math.floor(Math.random() * imagens_base.length)
+            const x = (this.item_base.index + 1) % imagens_base.length
             this.item_base = {
+              index: x,
               src: imagens_base[x],
             }
+            this.historico = []
+            this.item_selecionado = null
           },
         },
       });

@@ -39,6 +39,7 @@ main {
     .container {
         display: flex;
         flex-flow: row nowrap;
+        justify-content: center;
         align-items: stretch;
         max-width: 1700px;
         min-width: 800px;
@@ -108,6 +109,10 @@ header img {
     margin: 0 20px;
     display: flex;
     flex-flow: column nowrap;
+    min-height: 200px;
+    min-width: 200px;
+    max-height: 500px;
+    overflow: auto;
 }
 
 .historico-titulo {
@@ -117,6 +122,7 @@ header img {
 .historico-item {
     display: flex;
     flex-flow: row nowrap;
+    cursor: pointer;
 }
 
 .historico-imagem {
@@ -131,7 +137,7 @@ header img {
 }
 
 .itemDeEntrada {
-    flex: 1;
+    flex: 1 1;
     background-color: rgb(167, 167, 167);
     display: grid;
     border-radius: 15px;
@@ -147,6 +153,11 @@ header img {
     align-items: center;
 }
 
+.canvas-geral-entrada canvas {
+    max-width: 100%;
+    max-height: 500px;
+}
+
 .imagem-entrada {
     grid-row: 1;
     grid-column: 1;
@@ -158,7 +169,7 @@ header img {
 
 .imagem-entrada img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 500px;
 }
 
 .video-entrada {
@@ -172,7 +183,7 @@ header img {
 
 .video-entrada video {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 500px;
 }
 
 .canvas-entrada {
@@ -184,19 +195,30 @@ header img {
     align-items: center;
 }
 
-.menu-entrada {
+.canvas-entrada canvas {
+    max-width: 100%;
+    max-height: 500px;
+}
+
+.menu-entrada-container {
     grid-row: 1;
     grid-column: 1;
     display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: flex-end;
+    flex-flow: column nowrap;
+    justify-content: flex-end;
     color: white;
     z-index: 1;
 }
 
+.menu-entrada {
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+}
+
 .itemBase {
-    flex: 1;
+    flex: 1 1;
     background-color: rgb(167, 167, 167);
     display: grid;
     border-radius: 15px;
@@ -214,7 +236,7 @@ header img {
 
 .imagem-base img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 500px;
 }
 
 .canvas-base {
@@ -226,13 +248,60 @@ header img {
     align-items: center;
 }
 
-.menu-base {
+.canvas-base canvas {
+    max-width: 100%;
+    max-height: 500px;
+}
+
+.menu-base-container {
     grid-row: 1;
     grid-column: 1;
     display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: flex-end;
+    flex-flow: column nowrap;
+    justify-content: flex-end;
     color: white;
     z-index: 1;
+}
+
+.menu-base {
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.dialogo-modal {
+    width: 500px;
+    height: 500px;
+    border-radius: 20px;
+    background-color: white;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.canvas-container {
+    width: 400px;
+    max-height: 400px;
+}
+
+.canvas-container canvas {
+    max-width: 100%;
+    max-height: 100%;
 }
