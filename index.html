@@ -1,20 +1,33 @@
 <html lang="pt-BR">
   <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="index.css">
+    <title>O Posista</title>
+    <link rel="icon" href="assets/icon.png">
+    <!-- Responsivivdade -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
+    <meta name="theme-color" content="black">
 
+    <!-- Arquivos para utilização do modelo do TensorFlow.js -->
     <script src="scripts/tfjs.js"></script>
     <!-- Import @tensorflow/tfjs-core -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script> -->
     <!-- Adds the WebGL backend to the global backend registry -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script> -->
     <script src="scripts/pose-detection.js"></script>
-    <!-- Script da aplicação -->
     
+    <!-- Script da aplicação -->
     <script src="index.js"></script>
+    <!-- Framework -->
     <script src="scripts/vue.global.js"></script>
 
+    <!-- Estilos -->
+    <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="assets/fonts/css2.css" />
+    
+    <!-- Manifest.json -->
+    <link rel="manifest" href="manifest.json">
   </head>
 
   <body>
@@ -450,6 +463,25 @@
         },
       });
       app.mount('#app');
+    </script>
+    
+    <!-- PWA -->
+    <script>
+      window.addEventListener('load', () => {
+        registerSW();
+      });
+
+      // Registro do Service Worker
+      async function registerSW() {
+        if ('serviceWorker' in navigator) {
+          try {
+            await navigator.serviceWorker.register('scripts/serviceworker.js');
+          }
+          catch (e) {
+            console.log('SW registration failed');
+          }
+        }
+      }
     </script>
   </body>
 </html>

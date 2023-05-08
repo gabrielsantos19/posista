@@ -1,0 +1,22 @@
+{
+	"name":"O Posista",
+	"short_name":"Posista",
+	"start_url":"index.html",
+	"display":"standalone",
+	"background_color":"#5900b3",
+	"theme_color":"black",
+	"scope": ".",
+	"description":"Avaliador de similaridade entre poses",
+	"icons":[
+	{
+        "src":"assets/icon.png",
+        "sizes":"160x160",
+        "type":"image/png"
+	},
+	{
+        "src":"assets/icon.png",
+        "sizes":"160x160",
+        "type":"image/png"
+	}
+    ]
+}
