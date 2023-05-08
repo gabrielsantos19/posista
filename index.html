@@ -178,6 +178,7 @@
         data() {
           return {
             modelo_inicializado: false,
+            video_inicializado: false,
             item_base: {
               index: 1,
               src: imagens_base[1],
@@ -215,8 +216,6 @@
         },
         mounted() {
           Modelo.inicializar_modulo().then((r) => this.modelo_inicializado = r)
-          const id_intervalo = setTimeout(this.contar_contagem_regressiva, 1000)
-          this.id_intervalo = id_intervalo
           if (navigator.mediaDevices.getUserMedia) {
             this.abrir_camera()
           }
@@ -236,11 +235,15 @@
               clearTimeout(this.id_intervalo)
               this.id_intervalo = null
             }
-          }
-          // modelo_inicializado() {
-          //   this.atualizar_item_base()
-          //   this.atualizar_item_teste()
-          // },
+          },
+          modelo_inicializado() {
+            if (this.video_inicializado) {
+              const id_intervalo = setTimeout(this.contar_contagem_regressiva, 1000)
+              this.id_intervalo = id_intervalo
+            }
+            // this.atualizar_item_base()
+            // this.atualizar_item_teste()
+          },
           // item_base() {
           //   this.atualizar_item_base()
           // },
@@ -413,6 +416,11 @@
             console.log("Abrindo câmera")
             const stream = await navigator.mediaDevices.getUserMedia({ video: true })
             document.getElementById('videoEntrada').srcObject = stream
+            this.video_inicializado = true
+            if (this.modelo_inicializado) {
+              const id_intervalo = setTimeout(this.contar_contagem_regressiva, 1000)
+              this.id_intervalo = id_intervalo
+            }
           },
           async alterar_imagem_base() {
             console.log("Alterar imagem base")
