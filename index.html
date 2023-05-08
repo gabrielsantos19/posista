@@ -238,6 +238,7 @@
           },
           modelo_inicializado() {
             if (this.video_inicializado) {
+              console.log('Modelo e vídeo inicializados. Iniciando contagem.')
               const id_intervalo = setTimeout(this.contar_contagem_regressiva, 1000)
               this.id_intervalo = id_intervalo
             }
@@ -418,6 +419,7 @@
             document.getElementById('videoEntrada').srcObject = stream
             this.video_inicializado = true
             if (this.modelo_inicializado) {
+              console.log("Vídeo e modelo inicializados. Iniciando contagem.")
               const id_intervalo = setTimeout(this.contar_contagem_regressiva, 1000)
               this.id_intervalo = id_intervalo
             }
