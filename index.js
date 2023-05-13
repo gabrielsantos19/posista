@@ -11,6 +11,7 @@ const Modelo = (function() {
 
     async function inicializar_modulo() {
         console.log("Criando detector")
+        await tf.ready()
         detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
         return true
     }
