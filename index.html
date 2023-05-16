@@ -22,6 +22,8 @@
     <!-- Framework -->
     <script src="scripts/vue.global.js"></script>
 
+    <script src="assets/imagens_modelo/imagens_modelo.js"></script>
+
     <!-- Estilos -->
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="assets/fonts/css2.css" />
@@ -168,11 +170,12 @@
     <script>
       const { createApp } = Vue;
 
-      const imagens_base = [
-        "assets/imagens_modelo/pose1.jpg",
-        "assets/imagens_modelo/pose2.jpeg",
-        "assets/imagens_modelo/pose3.png",
-      ];
+      const imagens_base = imagens_modelo;
+      // const imagens_base = [
+      //   "assets/imagens_modelo/pose1.jpg",
+      //   "assets/imagens_modelo/pose2.jpeg",
+      //   "assets/imagens_modelo/pose3.png",
+      // ];
 
       const app = createApp({
         data() {
@@ -181,7 +184,8 @@
             video_inicializado: false,
             item_base: {
               index: 1,
-              src: imagens_base[1],
+              src: imagens_base[0].src,
+              imagem: imagens_base[0],
             },
             item_teste: {},
             score_corrente: 0,
@@ -191,7 +195,8 @@
               {
                 id: 0,
                 score: 500,
-                src: imagens_base[1],
+                src: imagens_base[0].src,
+                imagem: imagens_base[0],
               },
             ],
             contagem_regressiva: 10,
@@ -429,7 +434,8 @@
             const x = (this.item_base.index + 1) % imagens_base.length
             this.item_base = {
               index: x,
-              src: imagens_base[x],
+              src: imagens_base[x].src,
+              imagem: imagens_base[0],
             }
             this.historico = []
             this.item_selecionado = null
