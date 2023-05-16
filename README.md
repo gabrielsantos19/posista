@@ -7,3 +7,9 @@
 3. O sistema realizará a captura de imagens automaticamente em um intervalo de 10 segundos
 4. As imagens capturadas, bem como a pontuação dela, ficam disponíveis na lista à direita
 5. Clique em um item no histórico para rever e item e compartilhar o resultado
+
+## Referências
+
+MACEDO, Hendrik. Simbau. Disponível em: https://github.com/hendrikdcomp/amp/tree/master/projetos/simbau.
+
+MACEDO, Hendrik. Mobilepet. Disponível em: https://github.com/hendrikdcomp/amp/tree/master/projetos/mobilepet.
