@@ -270,6 +270,21 @@ header img {
     justify-content: center;
 }
 
+.item-base-credit {
+    grid-row: 1;
+    grid-column: 1;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.item-base-credit span {
+    padding: 0 10px;
+    background-color: white;
+    z-index: 1;
+}
+
 .modal {
     position: fixed;
     top: 0;

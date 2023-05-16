@@ -55,6 +55,9 @@
                 </span>
               </div>
             </div>
+            <div class="item-base-credit">
+              <span v-html="item_base.imagem.credit"></span>
+            </div>
           </div>
 
           <div class="resultado">
@@ -435,7 +438,7 @@
             this.item_base = {
               index: x,
               src: imagens_base[x].src,
-              imagem: imagens_base[0],
+              imagem: imagens_base[x],
             }
             this.historico = []
             this.item_selecionado = null
